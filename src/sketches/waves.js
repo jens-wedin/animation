@@ -14,6 +14,8 @@ import { getAmplitude } from '../utils/audioInput.js';
  * params.speed    → animation speed
  * params.scale    → wavelength (low = tight waves, high = wide)
  * params.hue      → base color offset
+ * params.ripple   → wave propagation speed (low = standing pattern, high = fast ripple)
+ * params.contrast → brightness curve multiplier
  * (trail is unused — each frame is fully redrawn for clean interference)
  */
 export function waveSketch(p, params) {
@@ -47,13 +49,13 @@ export function waveSketch(p, params) {
       };
     });
 
-    const micAmp  = params.mic ? getAmplitude() : 0;
-    const contrastBoost = 1 + micAmp * 2;
+    const micAmp        = params.mic ? getAmplitude() : 0;
+    const contrastBoost = params.contrast * (1 + micAmp * 2);
 
     for (let x = 0; x < p.width; x += CELL) {
       for (let y = 0; y < p.height; y += CELL) {
         const amplitudes = sources.map((s) =>
-          waveAmplitude(x, y, s.x, s.y, s.freq * freqScale, t * 3.5)
+          waveAmplitude(x, y, s.x, s.y, s.freq * freqScale, t * params.ripple)
         );
         const val = combineWaves(amplitudes); // [-1, 1]
 

@@ -9,11 +9,13 @@ import { getAmplitude } from '../utils/audioInput.js';
  * rotation speed, orbit radius, and phase. The combination of
  * independent rhythms creates complex interference patterns.
  *
- * params.density  → number of shapes
- * params.speed    → rotation and orbit speed multiplier
- * params.scale    → orbit radius scale
- * params.trail    → trail persistence
- * params.hue      → base color offset
+ * params.density → number of shapes
+ * params.speed   → rotation and orbit speed multiplier
+ * params.scale   → orbit radius scale
+ * params.trail   → trail persistence
+ * params.hue     → base color offset
+ * params.spin    → self-rotation speed multiplier (independent of orbit)
+ * params.layers  → concentric polygon rings drawn per shape
  */
 export function geometricSketch(p, params) {
   let shapes = [];
@@ -64,23 +66,25 @@ export function geometricSketch(p, params) {
     for (const s of shapes) {
       const ox  = cx + Math.cos(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
       const oy  = cy + Math.sin(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
-      const rot = t * s.rotSpeed * 60 + s.phase;
+      const rot = t * s.rotSpeed * 60 * params.spin + s.phase;
       const hue = (s.hueBase + params.hue + t * 15) % 360;
 
       p.push();
       p.translate(ox, oy);
       p.rotate(rot);
 
-      // Outer polygon — radius pulses with mic amplitude
+      // Concentric rings — count driven by params.layers
       p.noFill();
-      p.stroke(hue, 65, 90, 65);
-      p.strokeWeight(1.4);
-      drawPolygon(p, s.radius * sizeMod, s.sides);
-
-      // Inner polygon at half radius, rotated one extra step
-      p.stroke((hue + 30) % 360, 40, 100, 35);
-      p.strokeWeight(0.8);
-      drawPolygon(p, s.radius * 0.5 * sizeMod, s.sides + 1, Math.PI / s.sides);
+      const n = Math.round(params.layers);
+      for (let l = 0; l < n; l++) {
+        const lr    = s.radius * sizeMod * (1 - (l / n) * 0.65);
+        const lhue  = (hue + l * 25) % 360;
+        const lsat  = Math.max(28, 65 - l * 10);
+        const lalph = Math.max(14, 65 - l * 12);
+        p.stroke(lhue, lsat, 90, lalph);
+        p.strokeWeight(Math.max(0.4, 1.4 - l * 0.2));
+        drawPolygon(p, lr, s.sides + l, l * Math.PI / s.sides);
+      }
 
       p.pop();
     }

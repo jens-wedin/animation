@@ -18,7 +18,19 @@ const params = {
   trail:   0.03,
   hue:     200,
   mic:     false,
-  paused:  false,
+  // Flow Field
+  curl:       4.0,
+  colorShift: 1.0,
+  // Geometric
+  spin:       1.0,
+  layers:     2,
+  // Waves
+  ripple:     3.5,
+  contrast:   1.0,
+  // Audio Reactive
+  mirror:     false,
+  waveGain:   1.0,
+  paused:     false,
 };
 
 const SKETCHES = {
@@ -75,18 +87,46 @@ pane.addBinding(params, 'sketch', {
     'Wave Pattern':   'waves',
     'Audio Reactive': 'audio',
   },
-}).on('change', ({ value }) => loadSketch(value));
+}).on('change', ({ value }) => { loadSketch(value); syncModeBindings(value); });
 
 pane.addBinding(params, 'mic', { label: 'mic input' })
   .on('change', ({ value }) => { if (value) startMic(); else stopMic(); });
 
 const f = pane.addFolder({ title: 'Parameters', expanded: true });
 
-f.addBinding(params, 'speed',   { label: 'speed',   min: 0.1,    max: 5,     step: 0.05 });
-f.addBinding(params, 'density', { label: 'density',  min: 50,     max: 1200,  step: 10   });
+f.addBinding(params, 'speed',   { label: 'speed',   min: 0.1,    max: 5,     step: 0.05   });
+f.addBinding(params, 'density', { label: 'density',  min: 50,     max: 1200,  step: 10     });
 f.addBinding(params, 'scale',   { label: 'scale',    min: 0.0005, max: 0.02,  step: 0.0005 });
-f.addBinding(params, 'trail',   { label: 'trail',    min: 0.005,  max: 0.6,   step: 0.005 });
-f.addBinding(params, 'hue',     { label: 'hue',      min: 0,      max: 360,   step: 1    });
+f.addBinding(params, 'trail',   { label: 'trail',    min: 0.005,  max: 0.6,   step: 0.005  });
+f.addBinding(params, 'hue',     { label: 'hue',      min: 0,      max: 360,   step: 1      });
+
+// ── Mode-specific parameters — shown/hidden on mode change ────────────────
+const modeBindings = {
+  flowField: [
+    f.addBinding(params, 'curl',       { label: 'curl',        min: 0.5, max: 8,   step: 0.1  }),
+    f.addBinding(params, 'colorShift', { label: 'color shift', min: 0,   max: 3,   step: 0.05 }),
+  ],
+  geometric: [
+    f.addBinding(params, 'spin',   { label: 'spin',   min: 0, max: 3, step: 0.05 }),
+    f.addBinding(params, 'layers', { label: 'layers', min: 1, max: 5, step: 1    }),
+  ],
+  waves: [
+    f.addBinding(params, 'ripple',   { label: 'ripple',   min: 0.5, max: 8,   step: 0.1  }),
+    f.addBinding(params, 'contrast', { label: 'contrast', min: 0.5, max: 3.0, step: 0.05 }),
+  ],
+  audio: [
+    f.addBinding(params, 'mirror',   { label: 'mirror'                                  }),
+    f.addBinding(params, 'waveGain', { label: 'wave gain', min: 0.5, max: 5, step: 0.1 }),
+  ],
+};
+
+function syncModeBindings(mode) {
+  for (const [key, bindings] of Object.entries(modeBindings)) {
+    for (const b of bindings) b.hidden = key !== mode;
+  }
+}
+
+syncModeBindings(params.sketch); // hide non-active modes on load
 
 pane.addButton({ title: 'Reset sketch' }).on('click', () => {
   loadSketch(params.sketch);

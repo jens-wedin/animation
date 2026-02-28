@@ -7,10 +7,12 @@ import { getMicStatus, getAnalyser, getTimeDomain, getFrequencyData } from '../u
  * frequency-spectrum ring. Requires the shared mic to be active
  * (enable "mic input" in the parameters panel).
  *
- * params.speed   → waveform responsiveness (analyser smoothing)
- * params.density → bar height scale
- * params.trail   → fade speed
- * params.hue     → base colour offset
+ * params.speed    → waveform responsiveness (analyser smoothing)
+ * params.density  → bar height scale
+ * params.trail    → fade speed
+ * params.hue      → base colour offset
+ * params.mirror   → bilateral symmetry — second half of ring mirrors the first
+ * params.waveGain → oscilloscope excursion radius multiplier
  */
 export function audioSketch(p, params) {
   p.setup = () => {
@@ -65,8 +67,10 @@ export function audioSketch(p, params) {
     // ── Frequency bars — 360° ring ──────────────────────────────────────────
     const bins = freqDomain.length;
     for (let i = 0; i < bins; i++) {
-      const angle = (i / bins) * p.TWO_PI - p.HALF_PI;
-      const norm  = freqDomain[i] / 255;
+      const angle  = (i / bins) * p.TWO_PI - p.HALF_PI;
+      // mirror: second half of the ring reflects the first half
+      const srcBin = params.mirror && i >= bins / 2 ? bins - 1 - i : i;
+      const norm   = freqDomain[srcBin] / 255;
       const r1    = baseR;
       const r2    = baseR + norm * barMax;
       const hue   = (params.hue + (i / bins) * 120) % 360;
@@ -86,8 +90,8 @@ export function audioSketch(p, params) {
       const a2   = (next / samples) * p.TWO_PI - p.HALF_PI;
       const v1   = (timeDomain[i]    - 128) / 128;
       const v2   = (timeDomain[next] - 128) / 128;
-      const r1   = baseR + v1 * minDim * 0.06 * params.speed;
-      const r2   = baseR + v2 * minDim * 0.06 * params.speed;
+      const r1   = baseR + v1 * minDim * 0.06 * params.speed * params.waveGain;
+      const r2   = baseR + v2 * minDim * 0.06 * params.speed * params.waveGain;
       const hue  = (params.hue + 30 + (i / samples) * 60) % 360;
       p.stroke(hue, 55, 98, 80);
       p.strokeWeight(1.8);

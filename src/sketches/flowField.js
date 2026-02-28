@@ -13,6 +13,8 @@ import { getAmplitude } from '../utils/audioInput.js';
  * params.scale    → noise zoom (low = large smooth curves, high = tight turbulence)
  * params.trail    → how quickly trails fade (low = long memory)
  * params.hue      → base color offset (0–360)
+ * params.curl       → noise angle multiplier (low = laminar, high = turbulent swirls)
+ * params.colorShift → how strongly the flow angle drives hue rotation
  */
 export function flowFieldSketch(p, params) {
   let particles = [];
@@ -52,7 +54,7 @@ export function flowFieldSketch(p, params) {
       pt.px = pt.x;
       pt.py = pt.y;
 
-      const angle = p.noise(pt.x * params.scale, pt.y * params.scale, t) * p.TWO_PI * 4;
+      const angle = p.noise(pt.x * params.scale, pt.y * params.scale, t) * p.TWO_PI * params.curl;
 
       pt.x += p.cos(angle) * pt.life * params.speed * speedMod * 2;
       pt.y += p.sin(angle) * pt.life * params.speed * speedMod * 2;
@@ -64,7 +66,7 @@ export function flowFieldSketch(p, params) {
       if (pt.y < 0)        { pt.y = p.height; pt.py = p.height; }
       if (pt.y > p.height) { pt.y = 0;        pt.py = 0;        }
 
-      const hue = (p.degrees(angle) + params.hue) % 360;
+      const hue = (p.degrees(angle) * params.colorShift + params.hue) % 360;
       p.stroke(hue, 68, 92, 55);
       p.strokeWeight(1.1);
       p.line(pt.px, pt.py, pt.x, pt.y);
