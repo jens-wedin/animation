@@ -1,3 +1,6 @@
+import { polygonVertex } from '../utils/math.js';
+import { densityToShapeCount } from '../utils/particles.js';
+
 /**
  * Geometric Forms
  *
@@ -23,8 +26,8 @@ export function geometricSketch(p, params) {
     prevDensity = params.density;
   };
 
-  function buildShapes(n) {
-    const count = Math.max(3, Math.round(n / 40));
+  function buildShapes(density) {
+    const count = densityToShapeCount(density);
     shapes = Array.from({ length: count }, (_, i) => ({
       sides:      Math.floor(p.random(3, 9)),
       radius:     p.random(30, 130),
@@ -39,7 +42,6 @@ export function geometricSketch(p, params) {
   p.draw = () => {
     if (params.paused) return;
 
-    // Rebuild if density slider moved significantly
     if (Math.abs(params.density - prevDensity) > 30) {
       buildShapes(params.density);
       prevDensity = params.density;
@@ -53,11 +55,11 @@ export function geometricSketch(p, params) {
 
     const cx = p.width / 2;
     const cy = p.height / 2;
-    const t = p.frameCount * params.speed * 0.012;
+    const t  = p.frameCount * params.speed * 0.012;
 
     for (const s of shapes) {
-      const ox = cx + Math.cos(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
-      const oy = cy + Math.sin(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
+      const ox  = cx + Math.cos(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
+      const oy  = cy + Math.sin(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
       const rot = t * s.rotSpeed * 60 + s.phase;
       const hue = (s.hueBase + params.hue + t * 15) % 360;
 
@@ -69,22 +71,22 @@ export function geometricSketch(p, params) {
       p.noFill();
       p.stroke(hue, 65, 90, 65);
       p.strokeWeight(1.4);
-      polygon(p, 0, 0, s.radius, s.sides);
+      drawPolygon(p, s.radius, s.sides);
 
-      // Inner polygon — different phase
+      // Inner polygon at half radius, rotated one extra step
       p.stroke((hue + 30) % 360, 40, 100, 35);
       p.strokeWeight(0.8);
-      polygon(p, 0, 0, s.radius * 0.5, s.sides + 1, p.PI / s.sides);
+      drawPolygon(p, s.radius * 0.5, s.sides + 1, Math.PI / s.sides);
 
       p.pop();
     }
   };
 
-  function polygon(p, x, y, r, sides, angleOffset = 0) {
+  function drawPolygon(p, r, sides, angleOffset = 0) {
     p.beginShape();
     for (let i = 0; i <= sides; i++) {
-      const a = angleOffset + (i / sides) * p.TWO_PI;
-      p.vertex(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      const v = polygonVertex(i % sides, sides, r, angleOffset);
+      p.vertex(v.x, v.y);
     }
     p.endShape(p.CLOSE);
   }

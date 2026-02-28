@@ -1,3 +1,5 @@
+import { syncCount } from '../utils/particles.js';
+
 /**
  * Flow Field
  *
@@ -18,12 +20,8 @@ export function flowFieldSketch(p, params) {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.colorMode(p.HSB, 360, 100, 100, 100);
     p.frameRate(60);
-    spawnParticles(params.density);
+    syncCount(particles, params.density, () => newParticle());
   };
-
-  function spawnParticles(n) {
-    particles = Array.from({ length: n }, () => newParticle());
-  }
 
   function newParticle() {
     const x = p.random(p.width);
@@ -43,22 +41,20 @@ export function flowFieldSketch(p, params) {
 
     const t = p.frameCount * 0.003;
 
-    // Sync particle count to params
-    while (particles.length < params.density) particles.push(newParticle());
-    if (particles.length > params.density) particles.length = params.density;
+    // Keep particle count in sync with the density slider
+    syncCount(particles, params.density, () => newParticle());
 
     for (const pt of particles) {
       pt.px = pt.x;
       pt.py = pt.y;
 
-      const nx = pt.x * params.scale;
-      const ny = pt.y * params.scale;
-      const angle = p.noise(nx, ny, t) * p.TWO_PI * 4;
+      const angle = p.noise(pt.x * params.scale, pt.y * params.scale, t) * p.TWO_PI * 4;
 
       pt.x += p.cos(angle) * pt.life * params.speed * 2;
       pt.y += p.sin(angle) * pt.life * params.speed * 2;
 
-      // Wrap at edges
+      // Wrap at edges — also reset the previous position so the
+      // stroke doesn't draw a line across the full canvas width.
       if (pt.x < 0)        { pt.x = p.width;  pt.px = p.width;  }
       if (pt.x > p.width)  { pt.x = 0;        pt.px = 0;        }
       if (pt.y < 0)        { pt.y = p.height; pt.py = p.height; }

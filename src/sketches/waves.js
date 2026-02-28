@@ -1,3 +1,6 @@
+import { waveAmplitude, combineWaves } from '../utils/math.js';
+import { densityToSourceCount } from '../utils/particles.js';
+
 /**
  * Wave Interference
  *
@@ -13,7 +16,6 @@
  * (trail is unused — each frame is fully redrawn for clean interference)
  */
 export function waveSketch(p, params) {
-  // Pixel grid: draw colored rectangles at coarser resolution for perf
   const CELL = 10;
 
   p.setup = () => {
@@ -28,34 +30,28 @@ export function waveSketch(p, params) {
 
     p.background(0, 0, 5);
 
-    const srcCount = Math.max(2, Math.min(8, Math.round(params.density / 80)));
+    const srcCount = densityToSourceCount(params.density);
     const t = p.frameCount * params.speed * 0.025;
     const cx = p.width / 2;
     const cy = p.height / 2;
     const orbitR = Math.min(p.width, p.height) * 0.22;
+    const freqScale = params.scale * 4;
 
-    // Build source positions this frame
     const sources = Array.from({ length: srcCount }, (_, i) => {
       const phase = (i / srcCount) * p.TWO_PI;
       return {
-        x: cx + Math.cos(phase + t * (0.7 + i * 0.13)) * orbitR,
-        y: cy + Math.sin(phase + t * (0.5 + i * 0.11)) * orbitR * 0.75,
+        x:    cx + Math.cos(phase + t * (0.7 + i * 0.13)) * orbitR,
+        y:    cy + Math.sin(phase + t * (0.5 + i * 0.11)) * orbitR * 0.75,
         freq: 0.012 + i * 0.003,
       };
     });
 
-    const freqScale = params.scale * 4;
-
     for (let x = 0; x < p.width; x += CELL) {
       for (let y = 0; y < p.height; y += CELL) {
-        let val = 0;
-        for (const s of sources) {
-          const dx = x - s.x;
-          const dy = y - s.y;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          val += Math.sin(d * s.freq * freqScale - t * 3.5);
-        }
-        val /= srcCount; // normalise to roughly –1 … +1
+        const amplitudes = sources.map((s) =>
+          waveAmplitude(x, y, s.x, s.y, s.freq * freqScale, t * 3.5)
+        );
+        const val = combineWaves(amplitudes); // [-1, 1]
 
         const hue = ((val * 55) + params.hue) % 360;
         const sat = 55 + val * 25;

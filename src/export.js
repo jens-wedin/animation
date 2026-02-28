@@ -1,3 +1,5 @@
+import { formatTimestamp, selectMimeType } from './utils/format.js';
+
 /**
  * Canvas recorder using the MediaRecorder API.
  *
@@ -11,16 +13,11 @@ export function createRecorder(getCanvas) {
   let recorder = null;
   let chunks   = [];
 
-  // Pick the best supported codec
-  const MIME_TYPES = [
+  const MIME_CANDIDATES = [
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
   ];
-
-  function bestMime() {
-    return MIME_TYPES.find(t => MediaRecorder.isTypeSupported(t)) ?? 'video/webm';
-  }
 
   function start(fps = 30) {
     const canvas = getCanvas();
@@ -30,8 +27,13 @@ export function createRecorder(getCanvas) {
     }
 
     chunks = [];
-    const stream = canvas.captureStream(fps);
-    recorder = new MediaRecorder(stream, { mimeType: bestMime() });
+    const stream  = canvas.captureStream(fps);
+    const mimeType = selectMimeType(
+      MIME_CANDIDATES,
+      (t) => MediaRecorder.isTypeSupported(t)
+    );
+
+    recorder = new MediaRecorder(stream, { mimeType });
 
     // Collect data in 100 ms slices so we don't lose the last chunk on stop
     recorder.ondataavailable = (e) => {
@@ -68,25 +70,11 @@ export function createRecorder(getCanvas) {
     const url = URL.createObjectURL(blob);
     const a   = document.createElement('a');
     a.href     = url;
-    a.download = `animation-${timestamp()}.webm`;
+    a.download = `animation-${formatTimestamp(new Date())}.webm`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    // Delay revoke so the browser has time to start the download
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
-  }
-
-  function timestamp() {
-    const d = new Date();
-    return [
-      d.getFullYear(),
-      String(d.getMonth() + 1).padStart(2, '0'),
-      String(d.getDate()).padStart(2, '0'),
-      '-',
-      String(d.getHours()).padStart(2, '0'),
-      String(d.getMinutes()).padStart(2, '0'),
-      String(d.getSeconds()).padStart(2, '0'),
-    ].join('');
   }
 
   return { start, stop, isActive };
