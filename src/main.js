@@ -7,7 +7,6 @@ import { waveSketch        } from './sketches/waves.js';
 import { createRecorder    } from './export.js';
 
 // ─── Shared parameters ───────────────────────────────────────────────────────
-// Every sketch reads from this object each frame. Tweakpane writes to it.
 
 const params = {
   sketch:  'flowField',
@@ -25,6 +24,12 @@ const SKETCHES = {
   waves:     waveSketch,
 };
 
+const SKETCH_LABELS = {
+  flowField: 'Flow Field',
+  geometric: 'Geometric Forms',
+  waves:     'Wave Pattern',
+};
+
 // ─── p5 instance management ──────────────────────────────────────────────────
 
 const container = document.getElementById('canvas-container');
@@ -37,6 +42,17 @@ function loadSketch(name) {
   }
   const sketchFn = SKETCHES[name];
   instance = new p5((p) => sketchFn(p, params), container);
+
+  // 1.1.1: give the canvas an accessible name once p5 has inserted it
+  requestAnimationFrame(() => {
+    const canvas = container.querySelector('canvas');
+    if (canvas) {
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', `Generative animation — ${SKETCH_LABELS[name] ?? name} mode`);
+    }
+    // Keep the container label in sync too
+    container.setAttribute('aria-label', `${SKETCH_LABELS[name] ?? name} animation canvas`);
+  });
 }
 
 loadSketch(params.sketch);
@@ -68,11 +84,16 @@ pane.addButton({ title: 'Reset sketch' }).on('click', () => {
 
 // ─── Transport: play / pause ─────────────────────────────────────────────────
 
-const btnPlay = document.getElementById('btn-play');
+const btnPlay   = document.getElementById('btn-play');
+const srStatus  = document.getElementById('sr-status');
 
 btnPlay.addEventListener('click', () => {
   params.paused = !params.paused;
+
+  // 4.1.2: keep visible label, aria-label, and pressed state in sync
   btnPlay.textContent = params.paused ? '▶ Play' : '⏸ Pause';
+  btnPlay.setAttribute('aria-label', params.paused ? 'Resume animation' : 'Pause animation');
+  btnPlay.setAttribute('aria-pressed', String(params.paused));
   btnPlay.classList.toggle('active', params.paused);
 });
 
@@ -94,7 +115,12 @@ btnRecord.addEventListener('click', async () => {
     recordTimer.textContent = '';
 
     btnRecord.textContent = '⏺ Record';
+    btnRecord.setAttribute('aria-label', 'Start recording');
+    btnRecord.setAttribute('aria-pressed', 'false');
     btnRecord.classList.remove('recording');
+
+    // 4.1.3: announce state change assertively
+    srStatus.textContent = 'Recording stopped. Download starting.';
 
     await recorder.stop(); // triggers download
 
@@ -103,7 +129,11 @@ btnRecord.addEventListener('click', async () => {
     recorder.start(30);
 
     btnRecord.textContent = '⏹ Stop';
+    btnRecord.setAttribute('aria-label', 'Stop recording');
+    btnRecord.setAttribute('aria-pressed', 'true');
     btnRecord.classList.add('recording');
+
+    srStatus.textContent = 'Recording started.';
 
     timerInterval = setInterval(() => {
       recordSeconds += 1;
