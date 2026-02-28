@@ -6,6 +6,7 @@ import { geometricSketch  } from './sketches/geometric.js';
 import { waveSketch        } from './sketches/waves.js';
 import { audioSketch       } from './sketches/audio.js';
 import { cloudSketch       } from './sketches/clouds.js';
+import { laserDomeSketch   } from './sketches/laserDome.js';
 import { createRecorder    } from './export.js';
 import { startMic, stopMic } from './utils/audioInput.js';
 
@@ -36,6 +37,10 @@ const params = {
   cloudScale:      3.0,
   cloudCover:      0.55,
   cloudTurbulence: 1.2,
+  // Laser Dome
+  laserRings: 5,
+  laserBeams: 8,
+  laserGlow:  1.5,
   paused:     false,
 };
 
@@ -45,6 +50,7 @@ const SKETCHES = {
   waves:     waveSketch,
   audio:     audioSketch,
   clouds:    cloudSketch,
+  laserDome: laserDomeSketch,
 };
 
 const SKETCH_LABELS = {
@@ -53,6 +59,7 @@ const SKETCH_LABELS = {
   waves:     'Wave Pattern',
   audio:     'Audio Reactive',
   clouds:    'Clouds',
+  laserDome: 'Laser Dome',
 };
 
 // ─── p5 instance management ──────────────────────────────────────────────────
@@ -95,6 +102,7 @@ pane.addBinding(params, 'sketch', {
     'Wave Pattern':   'waves',
     'Audio Reactive': 'audio',
     'Clouds':         'clouds',
+    'Laser Dome':     'laserDome',
   },
 }).on('change', ({ value }) => { loadSketch(value); syncModeBindings(value); });
 
@@ -138,9 +146,14 @@ const modeBindings = {
     f.addBinding(params, 'waveGain', { label: 'wave gain', min: 0.5, max: 5, step: 0.1 }),
   ],
   clouds: [
-    f.addBinding(params, 'cloudScale',      { label: 'cloud scale',  min: 1,   max: 8,   step: 0.1  }),
+    f.addBinding(params, 'cloudScale',      { label: 'cloud scale',  min: 1,   max: 8,    step: 0.1  }),
     f.addBinding(params, 'cloudCover',      { label: 'cover',        min: 0.1, max: 0.95, step: 0.01 }),
-    f.addBinding(params, 'cloudTurbulence', { label: 'turbulence',   min: 0,   max: 3,   step: 0.05 }),
+    f.addBinding(params, 'cloudTurbulence', { label: 'turbulence',   min: 0,   max: 3,    step: 0.05 }),
+  ],
+  laserDome: [
+    f.addBinding(params, 'laserRings', { label: 'rings', min: 1, max: 12, step: 1   }),
+    f.addBinding(params, 'laserBeams', { label: 'beams', min: 2, max: 24, step: 1   }),
+    f.addBinding(params, 'laserGlow',  { label: 'glow',  min: 0.2, max: 4, step: 0.1 }),
   ],
 };
 
