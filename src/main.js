@@ -4,6 +4,7 @@ import { Pane } from 'tweakpane';
 import { flowFieldSketch } from './sketches/flowField.js';
 import { geometricSketch  } from './sketches/geometric.js';
 import { waveSketch        } from './sketches/waves.js';
+import { audioSketch       } from './sketches/audio.js';
 import { createRecorder    } from './export.js';
 
 // ─── Shared parameters ───────────────────────────────────────────────────────
@@ -22,12 +23,14 @@ const SKETCHES = {
   flowField: flowFieldSketch,
   geometric: geometricSketch,
   waves:     waveSketch,
+  audio:     audioSketch,
 };
 
 const SKETCH_LABELS = {
   flowField: 'Flow Field',
   geometric: 'Geometric Forms',
   waves:     'Wave Pattern',
+  audio:     'Audio Reactive',
 };
 
 // ─── p5 instance management ──────────────────────────────────────────────────
@@ -37,6 +40,7 @@ let instance = null;
 
 function loadSketch(name) {
   if (instance) {
+    instance._cleanup?.(); // release mic / audio context if the sketch registered one
     instance.remove();
     instance = null;
   }
@@ -64,9 +68,10 @@ const pane = new Pane({ title: '✦ Playground' });
 pane.addBinding(params, 'sketch', {
   label: 'mode',
   options: {
-    'Flow Field':   'flowField',
-    'Geometric':    'geometric',
-    'Wave Pattern': 'waves',
+    'Flow Field':     'flowField',
+    'Geometric':      'geometric',
+    'Wave Pattern':   'waves',
+    'Audio Reactive': 'audio',
   },
 }).on('change', ({ value }) => loadSketch(value));
 
