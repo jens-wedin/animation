@@ -1,0 +1,99 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080808;
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/* Canvas fills the full viewport */
+#canvas-container {
+  position: fixed;
+  inset: 0;
+}
+
+#canvas-container canvas {
+  display: block;
+}
+
+/* Floating transport bar at the bottom */
+#transport {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(8, 8, 8, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 8px 18px;
+  border-radius: 100px;
+  z-index: 100;
+}
+
+button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 5px 14px;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+button.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+button.recording {
+  background: rgba(220, 60, 60, 0.25);
+  border-color: rgba(220, 60, 60, 0.45);
+  color: #ff7070;
+}
+
+button.recording:hover {
+  background: rgba(220, 60, 60, 0.35);
+}
+
+.divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 4px;
+}
+
+#record-timer {
+  color: rgba(255, 100, 100, 0.8);
+  font-size: 11px;
+  min-width: 36px;
+  letter-spacing: 0.05em;
+}
+
+/* Tweakpane overrides — position top-right with breathing room */
+.tp-dfwv {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 240px !important;
+  z-index: 200;
+}
