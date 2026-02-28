@@ -20,9 +20,10 @@ html, body {
 
 #canvas-container canvas {
   display: block;
-  /* Stretch back to full viewport when pixelation > 1 */
-  width: 100%;
-  height: 100%;
+  /* Stretch back to full viewport when pixelation > 1.
+     !important beats the inline width/height px values p5 injects. */
+  width: 100% !important;
+  height: 100% !important;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges; /* Firefox */
 }
