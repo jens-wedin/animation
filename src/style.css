@@ -8,7 +8,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #080808;
+  background: #d8d2c4;
   font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
 }
 
@@ -28,7 +28,7 @@ html, body {
   image-rendering: -moz-crisp-edges; /* Firefox */
 }
 
-/* Floating transport bar at the bottom */
+/* ── Transport bar — raised hardware panel ───────────────────────────────── */
 #transport {
   position: fixed;
   bottom: 28px;
@@ -36,68 +36,77 @@ html, body {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(8, 8, 8, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 8px 18px;
-  border-radius: 100px;
+  gap: 6px;
+  background: #ccc7b8;
+  border: 2px solid #b0aa9e;
+  padding: 8px 16px;
+  border-radius: 4px;
   z-index: 100;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.22);
 }
 
+/* ── Buttons — physical raised pads ─────────────────────────────────────── */
 button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.75);
+  background: #e5dfd2;
+  border: 1px solid #b8b3a5;
+  color: #1b3e2a;
   padding: 5px 14px;
-  border-radius: 100px;
+  border-radius: 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 10px;
   font-family: inherit;
-  letter-spacing: 0.03em;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #a09890;
+  transition: background 0.07s, box-shadow 0.07s, transform 0.07s;
   white-space: nowrap;
 }
 
 button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.95);
+  background: #f0e9da;
+  color: #1b3e2a;
 }
 
+/* Pressed-in look when active (e.g. paused) */
 button.active {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: #1b5238;
+  border-color: #143d28;
   color: #fff;
+  box-shadow: 0 1px 0 #0f3020;
+  transform: translateY(2px);
 }
 
+/* Recording — orange action button */
 button.recording {
-  background: rgba(220, 60, 60, 0.25);
-  border-color: rgba(220, 60, 60, 0.45);
-  color: #ff7070;
+  background: #e54e1b;
+  border-color: #bf4016;
+  color: #fff;
+  box-shadow: 0 1px 0 #9e3410;
+  transform: translateY(2px);
 }
 
 button.recording:hover {
-  background: rgba(220, 60, 60, 0.35);
+  background: #f05c28;
 }
 
 .divider {
   width: 1px;
   height: 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #b0aa9e;
   margin: 0 4px;
 }
 
 #record-timer {
-  color: rgba(255, 100, 100, 0.8);
+  color: #e54e1b;
   font-size: 11px;
+  font-weight: 700;
   min-width: 36px;
   letter-spacing: 0.05em;
 }
 
-/* 2.4.7: visible focus ring for keyboard navigation */
 button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline: 2px solid #1b5238;
   outline-offset: 3px;
 }
 
@@ -114,7 +123,7 @@ button:focus-visible {
   border: 0;
 }
 
-/* ── Tweakpane — retro phosphor-green terminal theme ─────────────────────── */
+/* ── Tweakpane — hardware machine theme ─────────────────────────────────── */
 .tp-dfwv {
   position: fixed !important;
   top: 20px !important;
@@ -122,62 +131,70 @@ button:focus-visible {
   width: 240px !important;
   z-index: 200;
 
-  /* colour tokens */
-  --tp-base-background-color:           #010d01;
-  --tp-base-shadow-color:               rgba(0, 255, 65, 0.12);
+  --tp-base-background-color:           #d0cabb;
+  --tp-base-shadow-color:               rgba(0, 0, 0, 0.15);
   --tp-base-font-family:                'SF Mono', 'Fira Code', ui-monospace, monospace;
   --tp-base-border-radius:              2px;
 
-  --tp-button-background-color:         rgba(0, 255, 65, 0.07);
-  --tp-button-background-color-hover:   rgba(0, 255, 65, 0.14);
-  --tp-button-background-color-focus:   rgba(0, 255, 65, 0.12);
-  --tp-button-background-color-active:  rgba(0, 255, 65, 0.22);
-  --tp-button-foreground-color:         #00ff41;
+  /* Buttons (e.g. "Reset sketch") — dark green like the PLAY pads */
+  --tp-button-background-color:         #1b5238;
+  --tp-button-background-color-hover:   #245f42;
+  --tp-button-background-color-focus:   #1f5a3d;
+  --tp-button-background-color-active:  #0f3322;
+  --tp-button-foreground-color:         #ffffff;
 
-  --tp-container-background-color:        rgba(0, 255, 65, 0.04);
-  --tp-container-background-color-hover:  rgba(0, 255, 65, 0.08);
-  --tp-container-background-color-focus:  rgba(0, 255, 65, 0.07);
-  --tp-container-background-color-active: rgba(0, 255, 65, 0.12);
-  --tp-container-foreground-color:        rgba(0, 255, 65, 0.45);
+  --tp-container-background-color:        rgba(0, 0, 0, 0.05);
+  --tp-container-background-color-hover:  rgba(0, 0, 0, 0.08);
+  --tp-container-background-color-focus:  rgba(0, 0, 0, 0.06);
+  --tp-container-background-color-active: rgba(0, 0, 0, 0.12);
+  --tp-container-foreground-color:        #4a7a5c;
 
-  --tp-groove-foreground-color:         rgba(0, 255, 65, 0.18);
+  --tp-groove-foreground-color:         #b8b3a5;
 
-  --tp-input-background-color:          #001400;
-  --tp-input-background-color-hover:    #001f00;
-  --tp-input-background-color-focus:    #001a00;
-  --tp-input-background-color-active:   #002400;
-  --tp-input-foreground-color:          #00ff41;
+  /* Input rows — lighter cream, like the numbered pads */
+  --tp-input-background-color:          #e5dfd2;
+  --tp-input-background-color-hover:    #ede7d8;
+  --tp-input-background-color-focus:    #ebe5d6;
+  --tp-input-background-color-active:   #ddd7ca;
+  --tp-input-foreground-color:          #1b3e2a;
 
-  --tp-label-foreground-color:          rgba(0, 255, 65, 0.55);
+  --tp-label-foreground-color:          #4a7a5c;
 
-  --tp-monitor-background-color:        #001400;
-  --tp-monitor-foreground-color:        rgba(0, 255, 65, 0.7);
+  /* Monitor/display — dark green panel with light green digits (LCD feel) */
+  --tp-monitor-background-color:        #1b5238;
+  --tp-monitor-foreground-color:        #a8f0c0;
 
-  /* outer glow border */
-  border: 1px solid rgba(0, 255, 65, 0.28) !important;
-  box-shadow:
-    0 0 0 1px rgba(0, 255, 65, 0.06),
-    0 0 28px rgba(0, 255, 65, 0.08) !important;
+  border: 2px solid #b0aa9e !important;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.20) !important;
 }
 
-/* phosphor glow on title and folder headings */
+/* Title bar and folder headers — dark green strip with white label */
 .tp-dfwv .tp-rotv_b,
 .tp-dfwv .tp-fldv_b {
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.55);
+  background: #1b5238 !important;
+  color: #ffffff !important;
+  text-shadow: none;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-size: 10px;
 }
 
-/* label text glow */
+/* Parameter labels */
 .tp-dfwv .tp-lblv_l {
-  text-shadow: 0 0 6px rgba(0, 255, 65, 0.35);
+  color: #3d6e50;
+  text-shadow: none;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.07em;
 }
 
-/* slider track */
+/* Slider track — mid-tone groove */
 .tp-dfwv .tp-sldv_t {
-  background: rgba(0, 255, 65, 0.12) !important;
+  background: #bfb9ab !important;
 }
 
-/* slider knob — bright green pill with glow */
+/* Slider knob — orange, like the RECORD pad */
 .tp-dfwv .tp-sldv_k {
-  background: #00ff41 !important;
-  box-shadow: 0 0 8px rgba(0, 255, 65, 0.7) !important;
+  background: #e54e1b !important;
+  box-shadow: none !important;
 }

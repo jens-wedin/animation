@@ -92,7 +92,7 @@ loadSketch(params.sketch);
 
 // ─── Tweakpane ───────────────────────────────────────────────────────────────
 
-const pane = new Pane({ title: '✦ Playground' });
+const pane = new Pane({ title: 'VISUAL SYNTH' });
 
 pane.addBinding(params, 'sketch', {
   label: 'mode',
