@@ -6,6 +6,7 @@ import { geometricSketch  } from './sketches/geometric.js';
 import { waveSketch        } from './sketches/waves.js';
 import { audioSketch       } from './sketches/audio.js';
 import { createRecorder    } from './export.js';
+import { startMic, stopMic } from './utils/audioInput.js';
 
 // ─── Shared parameters ───────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ const params = {
   scale:   0.003,
   trail:   0.03,
   hue:     200,
+  mic:     false,
   paused:  false,
 };
 
@@ -74,6 +76,9 @@ pane.addBinding(params, 'sketch', {
     'Audio Reactive': 'audio',
   },
 }).on('change', ({ value }) => loadSketch(value));
+
+pane.addBinding(params, 'mic', { label: 'mic input' })
+  .on('change', ({ value }) => { if (value) startMic(); else stopMic(); });
 
 const f = pane.addFolder({ title: 'Parameters', expanded: true });
 

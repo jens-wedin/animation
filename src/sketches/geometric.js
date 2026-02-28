@@ -1,5 +1,6 @@
 import { polygonVertex } from '../utils/math.js';
 import { densityToShapeCount } from '../utils/particles.js';
+import { getAmplitude } from '../utils/audioInput.js';
 
 /**
  * Geometric Forms
@@ -47,15 +48,18 @@ export function geometricSketch(p, params) {
       prevDensity = params.density;
     }
 
+    const amp = params.mic ? getAmplitude() : 0;
+
     p.push();
     p.noStroke();
     p.fill(0, 0, 5, params.trail * 100);
     p.rect(0, 0, p.width, p.height);
     p.pop();
 
-    const cx = p.width / 2;
-    const cy = p.height / 2;
-    const t  = p.frameCount * params.speed * 0.012;
+    const cx      = p.width / 2;
+    const cy      = p.height / 2;
+    const t       = p.frameCount * params.speed * 0.012;
+    const sizeMod = 1 + amp * 3;
 
     for (const s of shapes) {
       const ox  = cx + Math.cos(s.phase + t * s.orbitSpeed * 80) * s.orbitR * params.scale;
@@ -67,16 +71,16 @@ export function geometricSketch(p, params) {
       p.translate(ox, oy);
       p.rotate(rot);
 
-      // Outer polygon
+      // Outer polygon — radius pulses with mic amplitude
       p.noFill();
       p.stroke(hue, 65, 90, 65);
       p.strokeWeight(1.4);
-      drawPolygon(p, s.radius, s.sides);
+      drawPolygon(p, s.radius * sizeMod, s.sides);
 
       // Inner polygon at half radius, rotated one extra step
       p.stroke((hue + 30) % 360, 40, 100, 35);
       p.strokeWeight(0.8);
-      drawPolygon(p, s.radius * 0.5, s.sides + 1, Math.PI / s.sides);
+      drawPolygon(p, s.radius * 0.5 * sizeMod, s.sides + 1, Math.PI / s.sides);
 
       p.pop();
     }

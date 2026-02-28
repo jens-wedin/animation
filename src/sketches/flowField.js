@@ -1,4 +1,5 @@
 import { syncCount } from '../utils/particles.js';
+import { getAmplitude } from '../utils/audioInput.js';
 
 /**
  * Flow Field
@@ -32,13 +33,16 @@ export function flowFieldSketch(p, params) {
   p.draw = () => {
     if (params.paused) return;
 
+    const amp = params.mic ? getAmplitude() : 0;
+
     // Translucent fill erases the previous frame gradually → trails
     p.push();
     p.noStroke();
-    p.fill(0, 0, 5, params.trail * 100);
+    p.fill(0, 0, 5, params.trail * 100 * (1 + amp * 3));
     p.rect(0, 0, p.width, p.height);
     p.pop();
 
+    const speedMod = 1 + amp * 4;
     const t = p.frameCount * 0.003;
 
     // Keep particle count in sync with the density slider
@@ -50,8 +54,8 @@ export function flowFieldSketch(p, params) {
 
       const angle = p.noise(pt.x * params.scale, pt.y * params.scale, t) * p.TWO_PI * 4;
 
-      pt.x += p.cos(angle) * pt.life * params.speed * 2;
-      pt.y += p.sin(angle) * pt.life * params.speed * 2;
+      pt.x += p.cos(angle) * pt.life * params.speed * speedMod * 2;
+      pt.y += p.sin(angle) * pt.life * params.speed * speedMod * 2;
 
       // Wrap at edges — also reset the previous position so the
       // stroke doesn't draw a line across the full canvas width.

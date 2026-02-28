@@ -1,52 +1,22 @@
+import { getMicStatus, getAnalyser, getTimeDomain, getFrequencyData } from '../utils/audioInput.js';
+
 /**
  * Audio Reactive
  *
- * Captures microphone input via the Web Audio API and renders
- * a circular oscilloscope (time-domain) overlaid on a 360°
- * frequency-spectrum ring.
+ * Renders a circular oscilloscope (time-domain) overlaid on a 360°
+ * frequency-spectrum ring. Requires the shared mic to be active
+ * (enable "mic input" in the parameters panel).
  *
- * params.speed   → waveform responsiveness (controls analyser smoothing)
+ * params.speed   → waveform responsiveness (analyser smoothing)
  * params.density → bar height scale
- * params.trail   → how quickly trails fade
+ * params.trail   → fade speed
  * params.hue     → base colour offset
  */
 export function audioSketch(p, params) {
-  let analyser   = null;
-  let timeDomain = null;
-  let freqDomain = null;
-  let stream     = null;
-  let audioCtx   = null;
-  let status     = 'requesting'; // 'requesting' | 'denied' | 'active'
-
-  // loadSketch() calls this before instance.remove() so the mic is released
-  p._cleanup = () => {
-    stream?.getTracks().forEach(t => t.stop());
-    audioCtx?.close().catch(() => {});
-    analyser = null;
-  };
-
-  async function initAudio() {
-    try {
-      stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const src = audioCtx.createMediaStreamSource(stream);
-      analyser  = audioCtx.createAnalyser();
-      analyser.fftSize              = 512;
-      analyser.smoothingTimeConstant = 0.82;
-      src.connect(analyser);
-      timeDomain = new Uint8Array(analyser.fftSize);
-      freqDomain = new Uint8Array(analyser.frequencyBinCount);
-      status = 'active';
-    } catch (_) {
-      status = 'denied';
-    }
-  }
-
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.colorMode(p.HSB, 360, 100, 100, 100);
     p.frameRate(60);
-    initAudio();
   };
 
   p.draw = () => {
@@ -55,8 +25,9 @@ export function audioSketch(p, params) {
     const cx     = p.width  / 2;
     const cy     = p.height / 2;
     const minDim = Math.min(p.width, p.height);
+    const status = getMicStatus();
 
-    // Trail fade — same mechanic as the other sketches
+    // Trail fade
     p.push();
     p.noStroke();
     p.fill(0, 0, 3, params.trail * 100);
@@ -64,7 +35,9 @@ export function audioSketch(p, params) {
     p.pop();
 
     if (status !== 'active') {
-      const msg = status === 'denied' ? 'MIC ACCESS DENIED' : 'REQUESTING MIC...';
+      const msg = status === 'denied'
+        ? 'MIC ACCESS DENIED'
+        : 'ENABLE MIC INPUT IN PARAMETERS ↗';
       p.push();
       p.fill(params.hue % 360, 65, 75, 70);
       p.noStroke();
@@ -76,9 +49,12 @@ export function audioSketch(p, params) {
     }
 
     // Tune smoothing: high speed → snappier response
+    const analyser = getAnalyser();
     analyser.smoothingTimeConstant = p.constrain(1 - params.speed * 0.13, 0.2, 0.95);
-    analyser.getByteTimeDomainData(timeDomain);
-    analyser.getByteFrequencyData(freqDomain);
+
+    const timeDomain = getTimeDomain();
+    const freqDomain = getFrequencyData();
+    if (!timeDomain || !freqDomain) return;
 
     const baseR  = minDim * 0.22;
     const barMax = minDim * 0.22 * (params.density / 600);

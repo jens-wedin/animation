@@ -1,5 +1,6 @@
 import { waveAmplitude, combineWaves } from '../utils/math.js';
 import { densityToSourceCount } from '../utils/particles.js';
+import { getAmplitude } from '../utils/audioInput.js';
 
 /**
  * Wave Interference
@@ -46,6 +47,9 @@ export function waveSketch(p, params) {
       };
     });
 
+    const micAmp  = params.mic ? getAmplitude() : 0;
+    const contrastBoost = 1 + micAmp * 2;
+
     for (let x = 0; x < p.width; x += CELL) {
       for (let y = 0; y < p.height; y += CELL) {
         const amplitudes = sources.map((s) =>
@@ -53,9 +57,9 @@ export function waveSketch(p, params) {
         );
         const val = combineWaves(amplitudes); // [-1, 1]
 
-        const hue = ((val * 55) + params.hue) % 360;
-        const sat = 55 + val * 25;
-        const bri = 30 + val * 45;
+        const hue   = ((val * 55) + params.hue) % 360;
+        const sat   = 55 + val * 25;
+        const bri   = p.constrain((30 + val * 45) * contrastBoost, 0, 100);
         const alpha = 65 + val * 20;
 
         p.fill(hue, sat, bri, alpha);
