@@ -5,6 +5,7 @@ import { flowFieldSketch } from './sketches/flowField.js';
 import { geometricSketch  } from './sketches/geometric.js';
 import { waveSketch        } from './sketches/waves.js';
 import { audioSketch       } from './sketches/audio.js';
+import { cloudSketch       } from './sketches/clouds.js';
 import { createRecorder    } from './export.js';
 import { startMic, stopMic } from './utils/audioInput.js';
 
@@ -31,6 +32,10 @@ const params = {
   // Audio Reactive
   mirror:     false,
   waveGain:   1.0,
+  // Clouds
+  cloudScale:      3.0,
+  cloudCover:      0.55,
+  cloudTurbulence: 1.2,
   paused:     false,
 };
 
@@ -39,6 +44,7 @@ const SKETCHES = {
   geometric: geometricSketch,
   waves:     waveSketch,
   audio:     audioSketch,
+  clouds:    cloudSketch,
 };
 
 const SKETCH_LABELS = {
@@ -46,6 +52,7 @@ const SKETCH_LABELS = {
   geometric: 'Geometric Forms',
   waves:     'Wave Pattern',
   audio:     'Audio Reactive',
+  clouds:    'Clouds',
 };
 
 // ─── p5 instance management ──────────────────────────────────────────────────
@@ -87,6 +94,7 @@ pane.addBinding(params, 'sketch', {
     'Geometric':      'geometric',
     'Wave Pattern':   'waves',
     'Audio Reactive': 'audio',
+    'Clouds':         'clouds',
   },
 }).on('change', ({ value }) => { loadSketch(value); syncModeBindings(value); });
 
@@ -128,6 +136,11 @@ const modeBindings = {
   audio: [
     f.addBinding(params, 'mirror',   { label: 'mirror'                                  }),
     f.addBinding(params, 'waveGain', { label: 'wave gain', min: 0.5, max: 5, step: 0.1 }),
+  ],
+  clouds: [
+    f.addBinding(params, 'cloudScale',      { label: 'cloud scale',  min: 1,   max: 8,   step: 0.1  }),
+    f.addBinding(params, 'cloudCover',      { label: 'cover',        min: 0.1, max: 0.95, step: 0.01 }),
+    f.addBinding(params, 'cloudTurbulence', { label: 'turbulence',   min: 0,   max: 3,   step: 0.05 }),
   ],
 };
 
