@@ -108,11 +108,70 @@ button:focus-visible {
   border: 0;
 }
 
-/* Tweakpane overrides — position top-right with breathing room */
+/* ── Tweakpane — retro phosphor-green terminal theme ─────────────────────── */
 .tp-dfwv {
   position: fixed !important;
   top: 20px !important;
   right: 20px !important;
   width: 240px !important;
   z-index: 200;
+
+  /* colour tokens */
+  --tp-base-background-color:           #010d01;
+  --tp-base-shadow-color:               rgba(0, 255, 65, 0.12);
+  --tp-base-font-family:                'SF Mono', 'Fira Code', ui-monospace, monospace;
+  --tp-base-border-radius:              2px;
+
+  --tp-button-background-color:         rgba(0, 255, 65, 0.07);
+  --tp-button-background-color-hover:   rgba(0, 255, 65, 0.14);
+  --tp-button-background-color-focus:   rgba(0, 255, 65, 0.12);
+  --tp-button-background-color-active:  rgba(0, 255, 65, 0.22);
+  --tp-button-foreground-color:         #00ff41;
+
+  --tp-container-background-color:        rgba(0, 255, 65, 0.04);
+  --tp-container-background-color-hover:  rgba(0, 255, 65, 0.08);
+  --tp-container-background-color-focus:  rgba(0, 255, 65, 0.07);
+  --tp-container-background-color-active: rgba(0, 255, 65, 0.12);
+  --tp-container-foreground-color:        rgba(0, 255, 65, 0.45);
+
+  --tp-groove-foreground-color:         rgba(0, 255, 65, 0.18);
+
+  --tp-input-background-color:          #001400;
+  --tp-input-background-color-hover:    #001f00;
+  --tp-input-background-color-focus:    #001a00;
+  --tp-input-background-color-active:   #002400;
+  --tp-input-foreground-color:          #00ff41;
+
+  --tp-label-foreground-color:          rgba(0, 255, 65, 0.55);
+
+  --tp-monitor-background-color:        #001400;
+  --tp-monitor-foreground-color:        rgba(0, 255, 65, 0.7);
+
+  /* outer glow border */
+  border: 1px solid rgba(0, 255, 65, 0.28) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 65, 0.06),
+    0 0 28px rgba(0, 255, 65, 0.08) !important;
+}
+
+/* phosphor glow on title and folder headings */
+.tp-dfwv .tp-rotv_b,
+.tp-dfwv .tp-fldv_b {
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.55);
+}
+
+/* label text glow */
+.tp-dfwv .tp-lblv_l {
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.35);
+}
+
+/* slider track */
+.tp-dfwv .tp-sldv_t {
+  background: rgba(0, 255, 65, 0.12) !important;
+}
+
+/* slider knob — bright green pill with glow */
+.tp-dfwv .tp-sldv_k {
+  background: #00ff41 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.7) !important;
 }
