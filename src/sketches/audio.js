@@ -16,7 +16,8 @@ import { getMicStatus, getAnalyser, getTimeDomain, getFrequencyData } from '../u
  */
 export function audioSketch(p, params) {
   p.setup = () => {
-    p.createCanvas(p.windowWidth, p.windowHeight);
+    const px = Math.max(1, params.pixelation);
+    p.createCanvas(Math.floor(p.windowWidth / px), Math.floor(p.windowHeight / px));
     p.colorMode(p.HSB, 360, 100, 100, 100);
     p.frameRate(60);
   };
@@ -105,6 +106,7 @@ export function audioSketch(p, params) {
   };
 
   p.windowResized = () => {
-    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    const px = Math.max(1, params.pixelation);
+    p.resizeCanvas(Math.floor(p.windowWidth / px), Math.floor(p.windowHeight / px));
   };
 }

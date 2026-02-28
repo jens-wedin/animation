@@ -16,8 +16,9 @@ const params = {
   density: 600,
   scale:   0.003,
   trail:   0.03,
-  hue:     200,
-  mic:     false,
+  hue:        200,
+  pixelation: 1,
+  mic:        false,
   // Flow Field
   curl:       4.0,
   colorShift: 1.0,
@@ -98,7 +99,17 @@ f.addBinding(params, 'speed',   { label: 'speed',   min: 0.1,    max: 5,     ste
 f.addBinding(params, 'density', { label: 'density',  min: 50,     max: 1200,  step: 10     });
 f.addBinding(params, 'scale',   { label: 'scale',    min: 0.0005, max: 0.02,  step: 0.0005 });
 f.addBinding(params, 'trail',   { label: 'trail',    min: 0.005,  max: 0.6,   step: 0.005  });
-f.addBinding(params, 'hue',     { label: 'hue',      min: 0,      max: 360,   step: 1      });
+f.addBinding(params, 'hue',        { label: 'hue',        min: 0, max: 360, step: 1  });
+f.addBinding(params, 'pixelation', { label: 'pixelation', min: 1, max: 16,  step: 1  })
+  .on('change', () => {
+    if (instance) {
+      const px = Math.max(1, params.pixelation);
+      instance.resizeCanvas(
+        Math.floor(window.innerWidth  / px),
+        Math.floor(window.innerHeight / px),
+      );
+    }
+  });
 
 // ── Mode-specific parameters — shown/hidden on mode change ────────────────
 const modeBindings = {
