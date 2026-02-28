@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves the site at /animation/ — set base for production builds
+  base: command === 'build' ? '/animation/' : '/',
+
   test: {
     // Run in Node — no browser APIs needed for the utility layer
     environment: 'node',
@@ -19,4 +22,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
